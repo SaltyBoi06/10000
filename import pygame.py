@@ -1,5 +1,6 @@
 import pygame
 import random
+from collections import Counter
 
 # Initialize Pygame
 pygame.init()
@@ -18,20 +19,20 @@ dice_images = [pygame.transform.scale(pygame.image.load(f"dice{i}.png"), (100, 1
 
 # Font
 font = pygame.font.Font(None, 36)
+small_font = pygame.font.Font(None, 24)
 
 # Roll dice function
 def roll_dice(num_dice=6):
     return [random.randint(1, 6) for _ in range(num_dice)]
 
 def score_roll(dice):
-    from collections import Counter
     counts = Counter(dice)
     score = 0
 
     # Scoring rules
-    if len(set(dice)) == 6:  # Straight (1-6)
+    if len(set(dice)) == 6:
         return 1500
-    if list(counts.values()).count(2) == 3:  # Three pairs
+    if list(counts.values()).count(2) == 3:
         return 1500
 
     for num, count in counts.items():
@@ -41,7 +42,6 @@ def score_roll(dice):
             else:
                 score += num * 100 * (count - 2)
 
-    # Single die scoring (1 and 5 if not part of a triplet)
     if counts[1] < 3:
         score += counts[1] * 100
     if counts[5] < 3:
@@ -68,19 +68,20 @@ def animate_dice(roll):
 def draw_game(dice, message="", scores=None):
     screen.fill(WHITE)
 
-    # Display dice
     for i, die in enumerate(dice):
-        screen.blit(dice_images[die - 1], (100 + i * 100, 200))
+        x = 80 + i * 80  # Increased distance between dice
+        y = 250
+        screen.blit(dice_images[die - 1], (x, y))
+        label = small_font.render(str(i + 1), True, BLACK)
+        screen.blit(label, (x + 20, y - 25))
 
-    # Display message
     msg_surface = font.render(message, True, BLACK)
-    screen.blit(msg_surface, (50, 50))
+    screen.blit(msg_surface, (50, 180))  # Moved score closer to dice
 
-    # Display scores
     if scores:
         for i, score in enumerate(scores):
             score_text = font.render(f"Player {i + 1}: {score}", True, BLACK)
-            screen.blit(score_text, (50, 400 + i * 30))
+            screen.blit(score_text, (50, 450 + i * 40))
 
     pygame.display.flip()
 
@@ -103,7 +104,7 @@ def play_turn(player_total_score):
         keep_values = []
         selecting = True
         while selecting:
-            draw_game(roll, "Press number keys to keep dice, Enter to roll")
+            draw_game(roll, "Press 1–6 to select dice, Enter to roll")
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -111,10 +112,10 @@ def play_turn(player_total_score):
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
                         selecting = False
-                    elif event.key in range(pygame.K_1, pygame.K_7):
-                        die_index = event.key - pygame.K_1
-                        if die_index < len(roll):
-                            keep_values.append(roll[die_index])
+                    elif pygame.K_1 <= event.key <= pygame.K_6:
+                        index = event.key - pygame.K_1
+                        if index < len(roll):
+                            keep_values.append(roll[index])
 
         if not valid_selection(roll, keep_values):
             draw_game(roll, "Invalid selection. Try again.")
@@ -127,18 +128,29 @@ def play_turn(player_total_score):
         if dice_remaining == 0:
             dice_remaining = 6
 
-        draw_game(roll, "Press Y to bank points, N to continue")
-        deciding = True
-        while deciding:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    exit()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_y:
-                        return turn_score
-                    if event.key == pygame.K_n:
-                        deciding = False
+        if player_total_score + turn_score >= 1000:
+            draw_game(roll, "Press Y to bank points, N to continue")
+            deciding = True
+            while deciding:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        exit()
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_y:
+                            return turn_score
+                        if event.key == pygame.K_n:
+                            deciding = False
+        else:
+            draw_game(roll, "Score too low to bank. Press any key to roll again.")
+            waiting = True
+            while waiting:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        exit()
+                    if event.type == pygame.KEYDOWN:
+                        waiting = False
 
 def play_game():
     num_players = int(input("Enter number of players: "))
