@@ -15,7 +15,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 # Load and resize dice images
-dice_images = [pygame.transform.scale(pygame.image.load(f"dice{i}.png"), (100, 100)) for i in range(1, 7)]
+dice_images = [pygame.transform.scale(pygame.image.load(f"dice{i}.png"), (80, 80)) for i in range(1, 7)]
 
 # Font
 font = pygame.font.Font(None, 36)
