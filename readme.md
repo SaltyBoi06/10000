@@ -9,11 +9,19 @@ loggbok
 pygame: 
 fixade nedre text så att man ser den
 
+==============
 25-04-29
+---------
+
 fixade avstånd och grejer
 
+==============
 25-05-05
+---------
+
 Fixade tärnings-bilderna så att de inte överlappar varandra
 
+==============
 25-05-14
+---------
 fixzde upp bilderna
