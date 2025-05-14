@@ -14,3 +14,6 @@ fixade avstånd och grejer
 
 25-05-05
 Fixade tärnings-bilderna så att de inte överlappar varandra
+
+25-05-14
+fixzde upp bilderna
