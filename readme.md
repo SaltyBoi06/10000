@@ -21,4 +21,4 @@ Fixade tärnings-bilderna så att de inte överlappar varandra
 
 25-05-14
 ---------
-fixzde upp bilderna
+Fixade upp bilderna
